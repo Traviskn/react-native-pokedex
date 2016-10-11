@@ -1,43 +1,92 @@
 import React, { Component } from 'react';
 import {
+  View,
+  Text,
+  Navigator,
+  TouchableOpacity,
   StyleSheet,
-  View
 } from 'react-native';
 
-import PokeList from './components/PokeList';
-import pokeData from './pokeData';
+import routes from './routes';
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      pokemon: []
-    };
+  render() {
+    return (
+      <Navigator
+        initialRoute={routes[0]}
+        renderScene={this.renderScene}
+        navigationBar={this.getNavBar()}
+        style={styles.container}
+      />
+    );
   }
 
-  componentWillMount() {
-    // TODO: hit the pokeapi
-    this.setState({
-      pokemon: pokeData
+  renderScene(route, navigator) {
+    return React.createElement(route.screen, {
+      route,
+      navigator,
+      routes,
     });
   }
 
-  render() {
+  getNavBar() {
     return (
-      <View style={styles.container}>
-        <PokeList pokemon={this.state.pokemon} />
-      </View>
+      <Navigator.NavigationBar
+        style={styles.navBar}
+        routeMapper={{
+          Title(route) {
+            return (
+              <View style={styles.title}>
+                <Text style={styles.text}>
+                  {route.title}
+                </Text>
+              </View>
+            );
+          },
+
+          LeftButton(route, navigator) {
+            if (route.index > 0) {
+              return (
+                <View style={styles.leftButton}>
+                  <TouchableOpacity onPress={() => navigator.pop()}>
+                    <Text style={styles.text}>&#60; Back</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            }
+
+            return null;
+          },
+
+          RightButton: () => null
+        }}
+      />
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 5,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  text: {
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold'
+  },
+  navBar: {
+    backgroundColor: '#EE0000',
+  },
+  title: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-    padding: 10
+    alignItems: 'center'
+  },
+  leftButton: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: 10
   }
 });
